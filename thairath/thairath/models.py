@@ -55,17 +55,25 @@ quote_tag = Table('news_tag', Base.metadata,
 class News(Base):
     __tablename__ = "news"
     id = Column(Integer, primary_key=True)
-    news_topic = Column('news_topic', Text())
-    news_content = Column('news_content', Text())
-    date = Column('date',Text())
+    title = Column('news_topic', Text())
+    body = Column('news_content', Text())
+    date = Column('date',DateTime())
     author = Column('author',Text())
     url = Column('url', Text())
+    category = Column('category',Text())
+    # rawhtml = Column('rawhtml',Text(14294000000))
     tags = relationship('Tag', secondary='news_tag',
         lazy='dynamic', backref="news")  # M-to-M for quote and tag
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, value):
+        return setattr(self, key, value)
 
 class Tag(Base):
     __tablename__ = "tag"
     id = Column(Integer, primary_key=True)
-    name = Column('name', Text(), unique=True)
+    name = Column('name', String(200), unique=True)
     quotes = relationship('News', secondary='news_tag',
         lazy='dynamic', backref="tag")  # M-to-M for quote and tag

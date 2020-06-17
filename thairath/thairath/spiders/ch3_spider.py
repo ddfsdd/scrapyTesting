@@ -3,9 +3,11 @@ import scrapy
 from time import sleep
 from scrapy.selector import Selector
 from ..items import NewsItem
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from datetime import datetime
+from pytz import timezone, all_timezones
 
 class Ch3Spider(scrapy.Spider):
     name = 'ch3_spider'
@@ -36,8 +38,8 @@ class Ch3Spider(scrapy.Spider):
             self.count_page += 1
             scrapy_selector = Selector(text=driver.page_source)
             content_page = scrapy_selector.css('.gs-title::attr(href)').extract()
-            # for page in content_page:
-            #     yield scrapy.Request(page, callback=self.parse_item)
+            for page in content_page:
+                yield scrapy.Request(page, callback=self.parse_item)
             next_page = driver.find_elements_by_css_selector("div[aria-label='หน้า " + str(self.count_page) + "']")
             if len(next_page) == 0:
                 return
@@ -65,9 +67,48 @@ class Ch3Spider(scrapy.Spider):
         url = response.request.url
         items['title'] = title
         items['author'] = author
-        items['date'] = date
+        items['date'] = self.parse_date(date)
         items['body'] = bodytext
         items['tags'] = tags
         items['url'] = url
+        items['category'] = self.parse_category(url, 1)
+        # items['rawhtml'] = response.text
         yield items
 
+    def parse_date(self,input_date):
+        date = input_date.replace("วันที่", "").replace("เวลา", "").replace("น.", "").replace("\xa0", " ")
+        date = date.strip()
+        splitlist = date.split(" ")
+        thai_abbr_months = [
+            "ม.ค.",
+            "ก.พ.",
+            "มี.ค.",
+            "เม.ย.",
+            "พ.ค.",
+            "มิ.ย.",
+            "ก.ค.",
+            "ส.ค.",
+            "ก.ย.",
+            "ต.ค.",
+            "พ.ย.",
+            "ธ.ค.",
+        ]
+        splitlist.remove("")
+        day = splitlist[0]
+        month = str(thai_abbr_months.index(splitlist[1]) + 1)
+        year = str(int(splitlist[2]) + 2500 - 543)
+        time = splitlist[3].replace("น.", "")
+        hour = (time.split(":"))[0]
+        minute = (time.split(":"))[1]
+        second = ((time.split(":"))[2])
+        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hour), minute=int(minute),
+                     second=int(second))
+        tz = timezone('Asia/Bangkok')
+        fmt = '%Y-%m-%d %H:%M:%S'
+        loc_dt = tz.localize(d)
+        return loc_dt.strftime(fmt)
+    def parse_category(self,url,indexOfCategory):
+        o = urlparse(url)
+        splitlist = o.path.split("/")
+        category = splitlist[indexOfCategory]
+        return category

@@ -16,4 +16,6 @@ class NewsItem(scrapy.Item):
     body = scrapy.Field()
     tags = scrapy.Field()
     url = scrapy.Field()
+    category = scrapy.Field()
+    # rawhtml = scrapy.Field()
     pass

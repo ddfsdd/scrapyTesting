@@ -65,10 +65,10 @@ ROBOTSTXT_OBEY = False
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   # 'thairath.pipelines.ThairathPipeline': 300,
-   # 'thairath.pipelines.DuplicatesPipeline' :200,
-   'thairath.elasticpipe.ElasticPipeline': 300,
-   'thairath.elasticpipe.DuplicatesPipeline': 200
+   'thairath.pipelines.ThairathPipeline': 300,
+   'thairath.pipelines.DuplicatesPipeline' :200,
+   # 'thairath.elasticpipe.ElasticPipeline': 300,
+   # 'thairath.elasticpipe.DuplicatesPipeline': 200
 
 }
 

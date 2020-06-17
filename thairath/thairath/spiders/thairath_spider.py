@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from ..items import NewsItem
-from urllib.parse import quote
+from urllib.parse import quote,urlparse
+from datetime import datetime
+from pytz import timezone, all_timezones
 
 class ThaiRathSpider(scrapy.Spider):
     name = 'thai_spider'
@@ -48,9 +50,44 @@ class ThaiRathSpider(scrapy.Spider):
         url = response.request.url
         items['title'] = title
         items['author'] = author
-        items['date'] = date
+        items['date'] = self.parse_date(date)
         items['body'] = bodytext
         items['tags'] = tags
         items['url'] = url
+        items['category'] = self.parse_category(url,2)
+        # items['rawhtml'] = response.text
         yield items
 
+    def parse_date(self,input_date):
+        date = input_date.replace("\xa0", " ")
+        splitlist = date.split(" ")
+        thai_abbr_months = [
+            "ม.ค.",
+            "ก.พ.",
+            "มี.ค.",
+            "เม.ย.",
+            "พ.ค.",
+            "มิ.ย.",
+            "ก.ค.",
+            "ส.ค.",
+            "ก.ย.",
+            "ต.ค.",
+            "พ.ย.",
+            "ธ.ค.",
+        ]
+        day = splitlist[0]
+        month = str(thai_abbr_months.index(splitlist[1]) + 1)
+        year = str(int(splitlist[2]) - 543)
+        time = splitlist[3].replace("น.", "")
+        hour = (time.split(":"))[0]
+        minute = (time.split(":"))[1]
+        d = datetime(year=int(year), month=int(month), day=int(day), hour=int(hour), minute=int(minute), )
+        tz = timezone('Asia/Bangkok')
+        fmt = '%Y-%m-%d %H:%M:%S'
+        loc_dt = tz.localize(d)
+        return  loc_dt.strftime(fmt)
+    def parse_category(self,url,indexOfCategory):
+        o = urlparse(url)
+        splitlist = o.path.split("/")
+        category = splitlist[indexOfCategory]
+        return category

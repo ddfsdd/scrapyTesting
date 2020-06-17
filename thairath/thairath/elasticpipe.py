@@ -13,9 +13,7 @@ class ElasticPipeline:
 
     def process_item(self, item, spider):
         es = self.es
-        print(item)
-        news = {'title':item['title'], 'author':item['author'], 'date':item['date'], 'body':item['body'], 'tags':item['tags'] }
-        newsJSON = json.dumps(news)
+        newsJSON = json.dumps(item)
         if es is not None:
             if create_index(es, 'newsdb'):
                 out = store_record(es, 'newsdb', newsJSON)
@@ -67,6 +65,12 @@ def create_index(es_object, index_name):
                         "type": "text"
                     },
                     "tags":{
+                        "type": "text"
+                    },
+                    "category": {
+                        "type": "text"
+                    },
+                    "rawhtml":{
                         "type": "text"
                     },
 

@@ -19,11 +19,16 @@ class ThairathPipeline:
         session = self.Session()
         tag = Tag()
         news = News()
-        news.author = item["author"]
-        news.news_topic = item["title"]
-        news.news_content = item["body"]
-        news.date = item["date"]
-        news.url = item["url"]
+        for key in dict(item).keys():
+            if key != "tags" :
+                news[key]=item[key]
+        # news.author = item["author"]
+        # news.news_topic = item["title"]
+        # news.news_content = item["body"]
+        # news.date = item["date"]
+        # news.url = item["url"]
+        # news.category=item["category"]
+        # news.rawhtml=item["rawhtml"]
         for tag_name in item["tags"]:
             tag = Tag(name=tag_name)
             exist_tag = session.query(Tag).filter_by(name=tag.name).first()
