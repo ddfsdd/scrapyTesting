@@ -38,6 +38,8 @@ class Ch3Spider(scrapy.Spider):
             self.count_page += 1
             scrapy_selector = Selector(text=driver.page_source)
             content_page = scrapy_selector.css('.gs-title::attr(href)').extract()
+            if len(content_page) == 0:
+                return
             for page in content_page:
                 yield scrapy.Request(page, callback=self.parse_item)
             next_page = driver.find_elements_by_css_selector("div[aria-label='หน้า " + str(self.count_page) + "']")

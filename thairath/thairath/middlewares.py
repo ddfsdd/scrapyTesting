@@ -4,15 +4,20 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+from collections import Counter
 
 from scrapy import signals
-
-
+from .items import NewsItem
+from pythainlp import word_tokenize
+# import multiprocessing
+# manager = multiprocessing.Manager()
+wordCounter = Counter()
 class ThairathSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
     # passed objects.
-
+    def __init__(self):
+        print("init middleware")
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
@@ -31,8 +36,16 @@ class ThairathSpiderMiddleware:
         # Called with the results returned from the Spider, after
         # it has processed the response.
 
+        global wordCounter
         # Must return an iterable of Request, dict or Item objects.
+
         for i in result:
+            if isinstance(i, NewsItem):
+                tokenizeList=word_tokenize(i["title"],keep_whitespace=False)
+                # print("this is the list")
+                # print(wordCounter)
+                for word in tokenizeList:
+                    wordCounter[word]+=1
             yield i
 
     def process_spider_exception(self, response, exception, spider):

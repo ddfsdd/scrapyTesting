@@ -56,7 +56,7 @@ class News(Base):
     __tablename__ = "news"
     id = Column(Integer, primary_key=True)
     title = Column('news_topic', Text())
-    body = Column('news_content', Text())
+    body = Column('news_content', Text(400000))
     date = Column('date',DateTime())
     author = Column('author',Text())
     url = Column('url', Text())

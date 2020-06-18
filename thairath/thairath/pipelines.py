@@ -20,6 +20,7 @@ class ThairathPipeline:
         tag = Tag()
         news = News()
         for key in dict(item).keys():
+
             if key != "tags" :
                 news[key]=item[key]
         # news.author = item["author"]

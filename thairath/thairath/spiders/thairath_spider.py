@@ -25,6 +25,8 @@ class ThaiRathSpider(scrapy.Spider):
         yield scrapy.Request('https://www.thairath.co.th/search?q='+quote(self.search_field)+'&p=1', callback=self.parse)
     def parse(self, response):
         content_page = response.css(".col-8 a").css("::attr(href)").extract()
+        if len(content_page) ==0:
+            return
         for page in content_page:
             yield scrapy.Request(page, callback= self.parse_item)
         self.count_page +=1
