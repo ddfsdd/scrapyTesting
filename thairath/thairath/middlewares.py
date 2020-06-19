@@ -41,11 +41,11 @@ class ThairathSpiderMiddleware:
 
         for i in result:
             if isinstance(i, NewsItem):
-                tokenizeList=word_tokenize(i["title"],keep_whitespace=False)
+                tokenizeList = word_tokenize(i["title"], engine="pyicu", keep_whitespace=False)
                 # print("this is the list")
                 # print(wordCounter)
                 for word in tokenizeList:
-                    wordCounter[word]+=1
+                    wordCounter[word] += 1
             yield i
 
     def process_spider_exception(self, response, exception, spider):

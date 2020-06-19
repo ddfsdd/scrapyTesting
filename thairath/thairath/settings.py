@@ -50,10 +50,14 @@ SPIDER_MIDDLEWARES = {
    'thairath.middlewares.ThairathSpiderMiddleware': 543,
 }
 
-# Enable or disable downloader middlewares
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+# PROXY_POOL_ENABLED = True
+# # Enable or disable downloader middlewares
+# # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 # DOWNLOADER_MIDDLEWARES = {
-#    'thairath.middlewares.ThairathDownloaderMiddleware': 543,
+#     # ...
+#     'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
+#     'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
+#     # ...
 # }
 
 # Enable or disable extensions
@@ -65,10 +69,10 @@ SPIDER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'thairath.pipelines.ThairathPipeline': 300,
-   'thairath.pipelines.DuplicatesPipeline' :200,
-   # 'thairath.elasticpipe.ElasticPipeline': 300,
-   # 'thairath.elasticpipe.DuplicatesPipeline': 200
+   # 'thairath.pipelines.ThairathPipeline': 300,
+   # 'thairath.pipelines.DuplicatesPipeline' :200,
+   'thairath.elasticpipe.ElasticPipeline': 300,
+   'thairath.elasticpipe.DuplicatesPipeline': 200
 
 }
 

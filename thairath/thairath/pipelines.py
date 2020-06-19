@@ -30,12 +30,13 @@ class ThairathPipeline:
         # news.url = item["url"]
         # news.category=item["category"]
         # news.rawhtml=item["rawhtml"]
-        for tag_name in item["tags"]:
-            tag = Tag(name=tag_name)
-            exist_tag = session.query(Tag).filter_by(name=tag.name).first()
-            if exist_tag is not None:  # the current tag exists
-                tag = exist_tag
-            news.tags.append(tag)
+        if "tags" in item:
+            for tag_name in item["tags"]:
+                tag = Tag(name=tag_name)
+                exist_tag = session.query(Tag).filter_by(name=tag.name).first()
+                if exist_tag is not None:  # the current tag exists
+                    tag = exist_tag
+                news.tags.append(tag)
         try:
             session.add(news)
             session.commit()

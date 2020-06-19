@@ -6,14 +6,21 @@
 import json
 from scrapy.exceptions import DropItem
 from elasticsearch7 import Elasticsearch
+from scrapy.utils.serialize import ScrapyJSONEncoder
+
 class ElasticPipeline:
+    encoder = ScrapyJSONEncoder()
     def __init__(self):
         self.es = connect_elasticsearch()
         create_index(self.es, 'newsdb')
 
+
     def process_item(self, item, spider):
         es = self.es
-        newsJSON = json.dumps(item)
+
+        # newsJSON = json.dumps(self.encoder.encode(item))
+        newsJSON = json.loads(self.encoder.encode(item))
+        print(newsJSON)
         if es is not None:
             if create_index(es, 'newsdb'):
                 out = store_record(es, 'newsdb', newsJSON)
@@ -28,10 +35,18 @@ class DuplicatesPipeline(object):
 
     def process_item(self, item, spider):
         es = self.es
-        search_object = {'_source': ['url'], 'query': {'match': {'url': item['url']}}}
-        res = search(es, 'newsdb', json.dumps(search_object))
+        # search_object = {'_source': ['url'], 'query': {'match': {'url': item['url']}}}
+        search_object = json.dumps({
+            '_source': ['url'],
+            "query": {
+                "match_phrase": {
+                    "url": item['url']
+                }
+            }
+        })
+        res = search(es, 'newsdb', search_object)
         print(res)
-        if len(res['hits'])==0:
+        if len(res['hits']['hits'])==0:
             return item
         else:
             raise DropItem("Duplicate item found: %s" % item["url"])
@@ -70,7 +85,7 @@ def create_index(es_object, index_name):
                     "category": {
                         "type": "text"
                     },
-                    "rawhtml":{
+                    "url":{
                         "type": "text"
                     },
 

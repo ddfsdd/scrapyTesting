@@ -21,15 +21,15 @@ def run_spider(spider,setting, search_value, alreadyUsedWordList, new_field):
             print(wordCounter)
 
             i = 0
-
-            while i <= len(wordCounter):
-                i += 1
-                wordSelected = wordCounter.most_common()[len(wordCounter) - i][0]
-                if wordSelected not in alreadyUsedWordList and isthai(wordSelected):
-                    print('not all words are used')
-                    new_field.value = wordSelected
-                    print(new_field.value)
-                    break
+            if len(wordCounter)>0:
+                while i <= len(wordCounter):
+                    i += 1
+                    wordSelected = wordCounter.most_common()[len(wordCounter) - i][0]
+                    if wordSelected not in alreadyUsedWordList and isthai(wordSelected):
+                        print('not all words are used')
+                        new_field.value = wordSelected
+                        print(new_field.value)
+                        break
             q.put(None)
         except Exception as e:
             q.put(e)
@@ -47,7 +47,7 @@ setting = get_project_settings()
 spider_loader = spiderloader.SpiderLoader.from_settings(setting)
 # process = CrawlerProcess(setting)
 alreadyUsedWord = Manager().list()
-iterations = 3
+iterations = 20
 roundCount = 0
 search_field=sys.argv[1]
 new_field = Manager().Value(c_char_p,search_field)
