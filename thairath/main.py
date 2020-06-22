@@ -3,13 +3,13 @@ from scrapy.utils.project import get_project_settings
 # from scrapy.crawler import CrawlerProcess
 from scrapy import spiderloader
 import sys
-# from thairath.middlewares import wordCounter
 from thairath.middlewares import wordSet
-from collections import Counter
+from thairath.models import News, db_connect, create_table
 import scrapy.crawler as crawler
 from multiprocessing import Process, Queue, Manager
 from twisted.internet import reactor
-
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 from pythainlp.util import isthai
 def run_spider(spider,setting, search_value, alreadyUsedWordList, notYetUsedWordList):
     def f(q,alreadyUsedWordList, notYetUsedWordList):
@@ -44,7 +44,11 @@ notYetUsedWord = Manager().list()
 iterations = 2
 roundCount = 0
 search_field=sys.argv[1]
-
+engine = db_connect()
+Session = sessionmaker(bind=engine)
+session = Session()
+initialNewsCount = 0
+duplicateCountBeforeBreak = 0
 while roundCount<iterations:
     alreadyUsedWord.append(search_field)
     # for spider_name in spider_loader.list():
@@ -52,15 +56,20 @@ while roundCount<iterations:
     #     print(spider_name)
     #     run_spider(spider_name,setting,search_field,alreadyUsedWord, notYetUsedWord)
     run_spider('thai_spider', setting, search_field, alreadyUsedWord, notYetUsedWord)
-        # process.crawl(spider_name,search_field=search_field)
-    # process.start()
+    session.commit()
+    newsCount = session.query(func.count(News.id)).scalar()
 
+    print('total news in db is' + str(newsCount))
     roundCount += 1
-
+    if newsCount-initialNewsCount <3:
+        print("Too low news now let's stop")
+        duplicateCountBeforeBreak +=1
+        if duplicateCountBeforeBreak >=2:
+            break
+    else:
+        initialNewsCount=newsCount
+        duplicateCountBeforeBreak = 0
     if len(notYetUsedWord) == 0:
         break
     search_field = notYetUsedWord.pop()
-    print('new search field is' + search_field)
-    print(alreadyUsedWord)
-    print(notYetUsedWord)
 

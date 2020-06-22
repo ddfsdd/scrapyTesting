@@ -30,11 +30,8 @@ class ThaiRathSpider(scrapy.Spider):
         for page in content_page:
             yield scrapy.Request(page, callback= self.parse_item)
         self.count_page +=1
-        print("\n")
         next_page = "https://www.thairath.co.th/search?q=" +quote(self.search_field)+'&p='+str(self.count_page+1)
         if self.count_page < self.max_page:
-            print(next_page)
-            print(self.count_page)
             yield scrapy.Request(next_page, callback= self.parse)
 
 
