@@ -3,7 +3,7 @@ import scrapy
 from time import sleep
 from scrapy.selector import Selector
 from ..items import NewsItem
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlparse, unquote
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
@@ -73,7 +73,7 @@ class Ch3Spider(scrapy.Spider):
         items['body'] = bodytext
         items['tags'] = tags
         items['url'] = url
-        items['category'] = self.parse_category(url, 1)
+        items['category'] = unquote(self.parse_category(url, 1))
         # items['rawhtml'] = response.text
         yield items
 

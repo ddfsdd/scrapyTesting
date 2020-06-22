@@ -4,14 +4,15 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-from collections import Counter
+from collections import Counter, Set
 
 from scrapy import signals
 from .items import NewsItem
 from pythainlp import word_tokenize
 # import multiprocessing
 # manager = multiprocessing.Manager()
-wordCounter = Counter()
+# wordCounter = Counter()
+wordSet = set()
 class ThairathSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -36,16 +37,16 @@ class ThairathSpiderMiddleware:
         # Called with the results returned from the Spider, after
         # it has processed the response.
 
-        global wordCounter
+        # global wordCounter
+        global wordSet
         # Must return an iterable of Request, dict or Item objects.
 
         for i in result:
             if isinstance(i, NewsItem):
                 tokenizeList = word_tokenize(i["title"], engine="pyicu", keep_whitespace=False)
-                # print("this is the list")
-                # print(wordCounter)
                 for word in tokenizeList:
-                    wordCounter[word] += 1
+                    wordSet.add(word)
+
             yield i
 
     def process_spider_exception(self, response, exception, spider):

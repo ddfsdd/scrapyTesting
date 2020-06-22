@@ -1,0 +1,21 @@
+  def f(q, notYetUsedWordList, new_field):
+        try:
+            runner = crawler.CrawlerRunner(setting)
+            deferred = runner.crawl(spider, search_field= search_value)
+            deferred.addBoth(lambda _: reactor.stop())
+            reactor.run()
+            print('In multi')
+            # print(wordCounter)
+            #
+            # i = 0
+            # if len(wordCounter)>0:
+            #     while i <= len(wordCounter):
+            #         i += 1
+            #         wordSelected = wordCounter.most_common()[len(wordCounter) - i][0]
+            #         if wordSelected not in alreadyUsedWordList and isthai(wordSelected):
+            #             print('not all words are used')
+            #             new_field.value = wordSelected
+            #             print(new_field.value)
+            #             break
+from ctypes import c_char_p
+new_field = Manager().Value(c_char_p,search_field)
