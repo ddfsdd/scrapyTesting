@@ -25,11 +25,7 @@ def db_connect():
             port="8080",
             db_name="db",
             # drivername="postgresql",
-            # user="nngpbmduikrokz",
-            # passwd="e50806caab773da9d1324ef81d8fc0e76b0ee6db2b6206d3525c3b55b54e65ab",
-            # host="ec2-54-86-170-8.compute-1.amazonaws.com",
-            # port="5432",
-            # db_name="d2se5r33ul7mim",
+
         )
         # return create_engine(CONNECTION_STRING, client_encoding='utf8')
         return create_engine(CONNECTION_STRING)

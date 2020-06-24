@@ -35,41 +35,43 @@ def run_spider(spider,setting, search_value, alreadyUsedWordList, notYetUsedWord
 
     if result is not None:
         raise result
+def functionDoesSomething():
+    setting = get_project_settings()
+    spider_loader = spiderloader.SpiderLoader.from_settings(setting)
+    # process = CrawlerProcess(setting)
+    alreadyUsedWord = Manager().list()
+    notYetUsedWord = Manager().list()
+    iterations = 2
+    roundCount = 0
+    search_field=sys.argv[1]
+    engine = db_connect()
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    initialNewsCount = 0
+    duplicateCountBeforeBreak = 0
+    while roundCount<iterations:
+        alreadyUsedWord.append(search_field)
+        # for spider_name in spider_loader.list():
+        #     print("Running spider %s" % (spider_name))
+        #     print(spider_name)
+        #     run_spider(spider_name,setting,search_field,alreadyUsedWord, notYetUsedWord)
+        run_spider('thai_spider', setting, search_field, alreadyUsedWord, notYetUsedWord)
+        session.commit()
+        newsCount = session.query(func.count(News.id)).scalar()
 
-setting = get_project_settings()
-spider_loader = spiderloader.SpiderLoader.from_settings(setting)
-# process = CrawlerProcess(setting)
-alreadyUsedWord = Manager().list()
-notYetUsedWord = Manager().list()
-iterations = 2
-roundCount = 0
-search_field=sys.argv[1]
-engine = db_connect()
-Session = sessionmaker(bind=engine)
-session = Session()
-initialNewsCount = 0
-duplicateCountBeforeBreak = 0
-while roundCount<iterations:
-    alreadyUsedWord.append(search_field)
-    # for spider_name in spider_loader.list():
-    #     print("Running spider %s" % (spider_name))
-    #     print(spider_name)
-    #     run_spider(spider_name,setting,search_field,alreadyUsedWord, notYetUsedWord)
-    run_spider('thai_spider', setting, search_field, alreadyUsedWord, notYetUsedWord)
-    session.commit()
-    newsCount = session.query(func.count(News.id)).scalar()
-
-    print('total news in db is' + str(newsCount))
-    roundCount += 1
-    if newsCount-initialNewsCount <3:
-        print("Too low news now let's stop")
-        duplicateCountBeforeBreak +=1
-        if duplicateCountBeforeBreak >=2:
+        print('total news in db is' + str(newsCount))
+        roundCount += 1
+        if newsCount-initialNewsCount <3:
+            print("Too low news now let's stop")
+            duplicateCountBeforeBreak +=1
+            if duplicateCountBeforeBreak >=2:
+                break
+        else:
+            initialNewsCount=newsCount
+            duplicateCountBeforeBreak = 0
+        if len(notYetUsedWord) == 0:
             break
-    else:
-        initialNewsCount=newsCount
-        duplicateCountBeforeBreak = 0
-    if len(notYetUsedWord) == 0:
-        break
-    search_field = notYetUsedWord.pop()
+        search_field = notYetUsedWord.pop()
 
+if __name__ == '__main__':
+    functionDoesSomething()
