@@ -48,10 +48,10 @@ def run_everything():
     # process = CrawlerProcess(setting)
     alreadyUsedWord = Manager().list()
     notYetUsedWord = Manager().list()
-    iterations = 2
+    iterations = 50
     roundCount = 0
     # get json, input the search value from flask to here.
-    search_field = "อนุทิน"
+    search_field = sys.argv[1]
     engine = db_connect()
     Session = sessionmaker(bind=engine)
     session = Session()
@@ -82,7 +82,6 @@ def run_everything():
         if len(notYetUsedWord) == 0:
             break
         search_field = notYetUsedWord.pop()
-
 
 if __name__ == '__main__':
     run_everything()
